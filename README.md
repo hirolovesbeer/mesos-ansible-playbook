@@ -37,9 +37,9 @@ Also, please set the hosts http_proxy, https_proxy, ftp_proxy.
 
 eg. ~/.bash_profile
 ```
-export HTTP_PROXY='http://yourproxy:proxyport//'
-export HTTPS_PROXY='http://yourproxy:proxyport//'
-export FTP_PROXY='http://yourproxy:proxyport//'
+export HTTP_PROXY='http://yourproxy:proxyport/'
+export HTTPS_PROXY='http://yourproxy:proxyport/'
+export FTP_PROXY='http://yourproxy:proxyport/'
 ```
 
 ## Zookeeper setting
