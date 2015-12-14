@@ -1,0 +1,94 @@
+---
+- hosts: master
+  remote_user: root
+  vars:
+    src_path: "."
+#    proxy_host: "http://proxy"
+#    proxy_port: "8080"
+
+  tasks:
+    - name: upgrade all packages
+      yum: name=* state=latest
+
+    - name: groupinstall
+      yum: name="@Development Tools" state=latest
+
+    - name: ntp & ntpdate yum install
+      yum: name="{{ item }}" state=latest
+      with_items:
+        - ntp
+        - ntpdate
+
+    - name: mesos rpm install
+      # shell: "rpm --httpproxy {{ proxy_host }} --httpport {{ proxy_port }} -Uvh http://repos.mesosphere.com/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm"
+      shell: "rpm -Uvh http://repos.mesosphere.com/el/6/noarch/RPMS/mesosphere-el-repo-6-2.noarch.rpm"
+      ignore_errors: yes
+
+    - name: mesos yum install
+      yum: name="{{ item }}" state=latest
+      with_items:
+        - mesos
+        - marathon
+        # - chronos
+
+    - name: zookeeper rpm install
+      # shell: "rpm --httpproxy {{ proxy_host }} --httpport {{ proxy_port }} -Uvh http://archive.cloudera.com/cdh4/one-click-install/redhat/6/x86_64/cloudera-cdh-4-0.x86_64.rpm"
+      shell: "rpm -Uvh http://archive.cloudera.com/cdh4/one-click-install/redhat/6/x86_64/cloudera-cdh-4-0.x86_64.rpm"
+      ignore_errors: yes
+
+    - name: zookeeper yum install
+      yum: name="zookeeper" state=latest
+
+    - name: zookeeper-initialize
+      shell: "zookeeper-server-initialize"
+      ignore_errors: yes
+
+    - name: install libselinux-python 
+      yum: name=libselinux-python state=installed
+
+    - name: copy zookeeper myid 
+      template: src="{{ src_path }}/{{ inventory_hostname }}.myid" dest=/var/lib/zookeeper/myid owner=root group=root mode=644
+
+    - name: copy zoo.cfg
+      copy: src="{{ src_path }}/zoo.cfg" dest=/etc/zookeeper/conf/zoo.cfg owner=root group=root mode=644
+      
+    - name: zookeeper-server start
+      shell: "zookeeper-server start"
+
+    - name: copy clouster file
+      copy: src="{{ src_path }}/cluster" dest=/etc/mesos-master/cluster owner=root group=root mode=644
+
+    - name: copy zk file
+      copy: src="{{ src_path }}/zk" dest=/etc/mesos/zk owner=root group=root mode=644
+
+    - name: copy quorum file
+      copy: src="{{ src_path }}/quorum" dest=/etc/mesos-master/quorum owner=root group=root mode=644
+
+    - name: copy hostname file
+      template: src="{{ src_path }}/hostname" dest=/etc/mesos-master/hostname owner=root group=root mode=644
+
+    - name: copy mesos-slave.conf file
+      copy: src="{{ src_path }}/mesos-slave.conf.master" dest=/etc/init/mesos-slave.conf owner=root group=root mode=644
+
+    - name: copy rc.local file
+      copy: src="{{ src_path }}/rc.local" dest=/etc/rc.d/rc.local owner=root group=root mode=755
+
+    - name: copy network
+      template: src="{{ src_path }}/network" dest=/etc/sysconfig/network owner=root group=root mode=644
+
+    - name: iptables disabled
+      service: name=iptables state=stopped enabled=false
+
+    - name: ip6tables disabled
+      service: name=ip6tables state=stopped enabled=false
+
+    - name: install epel
+      # shell: "rpm --httpproxy {{ proxy_host }} --httpport {{ proxy_port }} -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
+      shell: "rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm"
+      ignore_errors: yes
+
+    - name: disable seLinux
+      selinux: state=disabled
+
+    - name: reboot
+      command: shutdown -r now
