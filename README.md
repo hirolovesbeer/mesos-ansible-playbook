@@ -33,9 +33,9 @@ CentOS 6.7(x86_64)
 ## About proxy
 If mesos environment is under proxy/nat, please use proxy vars and rewrite proxy rpm's options.
 
-Also, please set the hosts http_proxy, https_proxy, ftp_proxy.
+Also, please set the host's proxy environment:  http_proxy, https_proxy, ftp_proxy.
 
-eg. ~/.bash_profile
+Example. "~/.bash_profile"
 ```
 export HTTP_PROXY='http://yourproxy:proxyport/'
 export HTTPS_PROXY='http://yourproxy:proxyport/'
@@ -53,7 +53,8 @@ Mesos masters are also working on zookeeper daemons.
 ```
 
 ### zk file
-zk is zookeeper setting file for mesos.
+"zk" file is zookeeper setting file for mesos.
+
 This file's deploy path is "/etc/mesos/zk"
 zk file's include hosts file's "[master]" hosts list like this.
 ```
@@ -63,7 +64,9 @@ add host and port '2181'.
 
 ### zoo.cfg
 This is zookeeper config file.
+
 It will be deploy "/etc/zookeeper/conf/zoo.cfg".
+
 And add the master server's lines last position of files like "server1=ipaddr:2888:3888".
 
 ```
@@ -135,5 +138,7 @@ You can also access Marathon WebUI(http://172.16.38.134:8080/)
 $ sudo ansible-playbook mesos-slave.yml -u root -k
 ```
 If slave can add the mesos systems, you can check Master WebUI(http://172.16.38.132:5050/#/slaves).
+
 On top page, "Acitvated" is count up in Slaves section.
+
 Also, "Resources" section, you can check slave's resources.
