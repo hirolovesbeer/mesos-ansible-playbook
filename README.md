@@ -33,6 +33,7 @@ Please check "centos67" Directory.
 - Development tools
 - ntp, ntpdate
 - epel
+- sshpass
 
 ## About proxy
 If mesos environment is under proxy/nat, please use proxy vars and rewrite proxy rpm's options.
@@ -127,9 +128,16 @@ This file only include number.
 
 
 ## Installation
+### sudo user
+Edit 'mesos-master.yml', 'mesos-slave.yml'
+```
+  remote_user: sudo-user
+```
+set the 'sudo-user' value for your suitable sudo user name.
+
 ### Mesos master
 ```
-$ sudo ansible-playbook mesos-master.yml -u root -k
+$ ansible-playbook mesos-master.yml -K -k -s
 ```
 - Mesos Master's WebUI
 If install is success, you can access Mesos master Web UI(http://172.16.38.178:5050/).
@@ -139,7 +147,7 @@ You can also access Marathon WebUI(http://172.16.38.179:8080/)
 
 ### Mesos slave
 ```
-$ sudo ansible-playbook mesos-slave.yml -u root -k
+$ ansible-playbook mesos-slave.yml -K -k -s
 ```
 If slave can add the mesos systems, you can check Master WebUI(http://172.16.38.178:5050/#/slaves).
 

@@ -1,6 +1,6 @@
 ---
 - hosts: slave
-  remote_user: root
+  remote_user: sudo-user
   vars:
     src_path: "."
 #    proxy_host: "http://proxy"
